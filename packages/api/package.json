@@ -1,0 +1,29 @@
+{
+  "name": "@ecoomerce-jardineria/api",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@ecoomerce-jardineria/db": "workspace:*",
+    "@ecoomerce-jardineria/types": "workspace:*",
+    "@hono/node-server": "^1.13.8",
+    "@supabase/supabase-js": "^2.48.1",
+    "@trpc/server": "^11.14.1",
+    "hono": "^4.7.11",
+    "zod": "^3.24.1"
+  }
+}

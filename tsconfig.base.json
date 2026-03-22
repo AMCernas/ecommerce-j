@@ -1,0 +1,13 @@
+{
+  "display": "root",
+  "files": [],
+  "references": [
+    { "path": "./apps/web" },
+    { "path": "./apps/admin" },
+    { "path": "./packages/api" },
+    { "path": "./packages/db" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/emails" },
+    { "path": "./packages/types" }
+  ]
+}

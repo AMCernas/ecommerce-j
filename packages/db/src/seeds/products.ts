@@ -1,32 +1,14 @@
 import 'dotenv/config';
-import { db } from './client';
-import { products } from './schema/products';
-import { categories } from './schema/products';
+import { db } from '../client';
+import { products } from '../schema/products';
 import { sql } from 'drizzle-orm';
 
-async function seed() {
-  console.log('🌱 Starting seed...');
+export async function seed(): Promise<void> {
+  console.log('🔄 Seeding products...');
 
-  // Clear existing data
-  await db.delete(products);
-  
-  console.log('Creating categories...');
-  
-  // Create categories
-  const categoryData = [
-    { name: 'Semillas', slug: 'semillas', description: 'Semillas de alta germinación' },
-    { name: 'Tierra', slug: 'tierra', description: 'Tierra preparada para jardín' },
-    { name: 'Composta', slug: 'composta', description: 'Composta orgánica premium' },
-    { name: 'Accesorios', slug: 'accesorios', description: 'Herramientas y accesorios' },
-  ];
+  // Clear existing products for idempotency
+  await db.execute(sql`TRUNCATE products RESTART IDENTITY CASCADE`);
 
-  for (const cat of categoryData) {
-    await db.execute(sql`INSERT INTO categories (name, slug, description) VALUES (${cat.name}, ${cat.slug}, ${cat.description}) ON CONFLICT (slug) DO NOTHING`);
-  }
-
-  console.log('Creating products...');
-
-  // Seed products - Semillas
   const seedProducts = [
     // SEMILLAS - Hortalizas
     {
@@ -43,18 +25,15 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 2,
       spaceNeeded: 'maceta_grande',
-      germinationRate: 92,
+      germinationRate: '92.00',
       daysToGerminate: 7,
       daysToHarvest: 75,
-      weightOptions: [
-        { g: 50, price: 35, stock: 100 },
-        { g: 250, price: 120, stock: 50 },
-      ],
+      weightOptions: [{ g: 50, price: 35, stock: 100 }, { g: 250, price: 120, stock: 50 }],
       images: ['https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=400'],
-      price: 35,
+      price: '35.00',
       stock: 150,
       seoTitle: 'Semillas de Tomate Cherry Orgánico | Jardín Verde',
-      seoDescription: 'Compra semillas de tomate cherry con 92% de germinación. Ideal para clima de Colima. Envío a toda México.',
+      seoDescription: 'Compra semillas de tomate cherry con 92% de germinación. Ideal para clima de Colima.',
     },
     {
       name: 'Chile Serrano',
@@ -70,18 +49,13 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 2,
       spaceNeeded: 'maceta_grande',
-      germinationRate: 88,
+      germinationRate: '88.00',
       daysToGerminate: 14,
       daysToHarvest: 90,
-      weightOptions: [
-        { g: 30, price: 28, stock: 80 },
-        { g: 100, price: 75, stock: 40 },
-      ],
+      weightOptions: [{ g: 30, price: 28, stock: 80 }, { g: 100, price: 75, stock: 40 }],
       images: ['https://images.unsplash.com/photo-1583119022894-919a4cc2c21c?w=400'],
-      price: 28,
+      price: '28.00',
       stock: 120,
-      seoTitle: 'Semillas de Chile Serrano Orgánico',
-      seoDescription: 'Semillas de chile serrano para clima cálido. Alta germinación.',
     },
     {
       name: 'Jitomate Saladette',
@@ -97,18 +71,13 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 2,
       spaceNeeded: 'jardín',
-      germinationRate: 90,
+      germinationRate: '90.00',
       daysToGerminate: 8,
       daysToHarvest: 85,
-      weightOptions: [
-        { g: 50, price: 32, stock: 90 },
-        { g: 250, price: 110, stock: 45 },
-      ],
+      weightOptions: [{ g: 50, price: 32, stock: 90 }, { g: 250, price: 110, stock: 45 }],
       images: ['https://images.unsplash.com/photo-1546470427-227c7b3f8311?w=400'],
-      price: 32,
+      price: '32.00',
       stock: 135,
-      seoTitle: 'Semillas de Jitomate Saladette',
-      seoDescription: 'Calidad profesional para tu huerto.',
     },
     {
       name: 'Pepino',
@@ -124,18 +93,13 @@ async function seed() {
       sunNeeds: 2,
       careLevel: 1,
       spaceNeeded: 'jardín',
-      germinationRate: 95,
+      germinationRate: '95.00',
       daysToGerminate: 6,
       daysToHarvest: 60,
-      weightOptions: [
-        { g: 100, price: 45, stock: 70 },
-        { g: 500, price: 180, stock: 30 },
-      ],
+      weightOptions: [{ g: 100, price: 45, stock: 70 }, { g: 500, price: 180, stock: 30 }],
       images: ['https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=400'],
-      price: 45,
+      price: '45.00',
       stock: 100,
-      seoTitle: 'Semillas de Pepino Orgánico',
-      seoDescription: 'Alta germinación, ideal para Colima.',
     },
     {
       name: 'Calabaza',
@@ -151,15 +115,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'campo',
-      germinationRate: 94,
+      germinationRate: '94.00',
       daysToGerminate: 7,
       daysToHarvest: 100,
-      weightOptions: [
-        { g: 100, price: 38, stock: 60 },
-        { g: 500, price: 150, stock: 25 },
-      ],
+      weightOptions: [{ g: 100, price: 38, stock: 60 }, { g: 500, price: 150, stock: 25 }],
       images: ['https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400'],
-      price: 38,
+      price: '38.00',
       stock: 85,
     },
     {
@@ -176,15 +137,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'jardín',
-      germinationRate: 93,
+      germinationRate: '93.00',
       daysToGerminate: 8,
       daysToHarvest: 110,
-      weightOptions: [
-        { g: 250, price: 55, stock: 55 },
-        { g: 1000, price: 180, stock: 20 },
-      ],
+      weightOptions: [{ g: 250, price: 55, stock: 55 }, { g: 1000, price: 180, stock: 20 }],
       images: ['https://images.unsplash.com/photo-1584736286279-4a865523c3ce?w=400'],
-      price: 55,
+      price: '55.00',
       stock: 75,
     },
     {
@@ -201,14 +159,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'jardín',
-      germinationRate: 91,
+      germinationRate: '91.00',
       daysToGerminate: 7,
       daysToHarvest: 65,
-      weightOptions: [
-        { g: 100, price: 40, stock: 65 },
-      ],
+      weightOptions: [{ g: 100, price: 40, stock: 65 }],
       images: ['https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400'],
-      price: 40,
+      price: '40.00',
       stock: 65,
     },
     {
@@ -216,7 +172,7 @@ async function seed() {
       slug: 'cebolla-blanca',
       category: 'semilla',
       subcategory: 'hortaliza',
-      description: 'Cebolla blanca paraTodo uso, almacenamiento prolongado.',
+      description: 'Cebolla blanca para todo uso, almacenamiento prolongado.',
       isOrganic: false,
       climateZones: ['templada', 'fria_montana'],
       sowMonths: [9, 10, 11],
@@ -225,15 +181,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 2,
       spaceNeeded: 'maceta_grande',
-      germinationRate: 85,
+      germinationRate: '85.00',
       daysToGerminate: 10,
       daysToHarvest: 150,
-      weightOptions: [
-        { g: 50, price: 30, stock: 80 },
-        { g: 250, price: 95, stock: 35 },
-      ],
+      weightOptions: [{ g: 50, price: 30, stock: 80 }, { g: 250, price: 95, stock: 35 }],
       images: ['https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400'],
-      price: 30,
+      price: '30.00',
       stock: 115,
     },
     {
@@ -250,15 +203,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'maceta_grande',
-      germinationRate: 88,
+      germinationRate: '88.00',
       daysToGerminate: 14,
       daysToHarvest: 180,
-      weightOptions: [
-        { g: 100, price: 48, stock: 50 },
-        { g: 500, price: 200, stock: 15 },
-      ],
+      weightOptions: [{ g: 100, price: 48, stock: 50 }, { g: 500, price: 200, stock: 15 }],
       images: ['https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400'],
-      price: 48,
+      price: '48.00',
       stock: 65,
     },
     {
@@ -275,15 +225,12 @@ async function seed() {
       sunNeeds: 2,
       careLevel: 1,
       spaceNeeded: 'maceta_pequeña',
-      germinationRate: 90,
+      germinationRate: '90.00',
       daysToGerminate: 6,
       daysToHarvest: 70,
-      weightOptions: [
-        { g: 30, price: 25, stock: 90 },
-        { g: 100, price: 65, stock: 40 },
-      ],
+      weightOptions: [{ g: 30, price: 25, stock: 90 }, { g: 100, price: 65, stock: 40 }],
       images: ['https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400'],
-      price: 25,
+      price: '25.00',
       stock: 130,
     },
     // SEMILLAS - Hierbas
@@ -301,15 +248,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'maceta_pequeña',
-      germinationRate: 85,
+      germinationRate: '85.00',
       daysToGerminate: 10,
       daysToHarvest: 40,
-      weightOptions: [
-        { g: 20, price: 22, stock: 120 },
-        { g: 100, price: 85, stock: 55 },
-      ],
+      weightOptions: [{ g: 20, price: 22, stock: 120 }, { g: 100, price: 85, stock: 55 }],
       images: ['https://images.unsplash.com/photo-1618375569909-3c8616cf7733?w=400'],
-      price: 22,
+      price: '22.00',
       stock: 175,
     },
     {
@@ -326,15 +270,12 @@ async function seed() {
       sunNeeds: 2,
       careLevel: 1,
       spaceNeeded: 'maceta_pequeña',
-      germinationRate: 88,
+      germinationRate: '88.00',
       daysToGerminate: 7,
       daysToHarvest: 45,
-      weightOptions: [
-        { g: 30, price: 20, stock: 150 },
-        { g: 100, price: 55, stock: 70 },
-      ],
-      images: ['https://images.unsplash.com/photo-1526346698789-22fd84314424?w=400'],
-      price: 20,
+      weightOptions: [{ g: 30, price: 20, stock: 150 }, { g: 100, price: 55, stock: 70 }],
+      images: ['https://images.unsplash.com/photo-1526346698789-589c33041d3c?w=400'],
+      price: '20.00',
       stock: 220,
     },
     {
@@ -351,14 +292,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'maceta_pequeña',
-      germinationRate: 80,
+      germinationRate: '80.00',
       daysToGerminate: 14,
       daysToHarvest: 50,
-      weightOptions: [
-        { g: 20, price: 18, stock: 60 },
-      ],
+      weightOptions: [{ g: 20, price: 18, stock: 60 }],
       images: ['https://images.unsplash.com/photo-1515023115689-589c33041d3c?w=400'],
-      price: 18,
+      price: '18.00',
       stock: 60,
     },
     {
@@ -375,14 +314,12 @@ async function seed() {
       sunNeeds: 2,
       careLevel: 1,
       spaceNeeded: 'maceta_pequeña',
-      germinationRate: 75,
+      germinationRate: '75.00',
       daysToGerminate: 14,
       daysToHarvest: 60,
-      weightOptions: [
-        { g: 20, price: 22, stock: 80 },
-      ],
+      weightOptions: [{ g: 20, price: 22, stock: 80 }],
       images: ['https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=400'],
-      price: 22,
+      price: '22.00',
       stock: 80,
     },
     {
@@ -399,14 +336,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'maceta_pequeña',
-      germinationRate: 70,
+      germinationRate: '70.00',
       daysToGerminate: 14,
       daysToHarvest: 90,
-      weightOptions: [
-        { g: 20, price: 25, stock: 55 },
-      ],
+      weightOptions: [{ g: 20, price: 25, stock: 55 }],
       images: ['https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400'],
-      price: 25,
+      price: '25.00',
       stock: 55,
     },
     // SEMILLAS - Flores
@@ -424,15 +359,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'jardín',
-      germinationRate: 92,
+      germinationRate: '92.00',
       daysToGerminate: 7,
       daysToHarvest: 80,
-      weightOptions: [
-        { g: 50, price: 28, stock: 70 },
-        { g: 200, price: 90, stock: 30 },
-      ],
+      weightOptions: [{ g: 50, price: 28, stock: 70 }, { g: 200, price: 90, stock: 30 }],
       images: ['https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=400'],
-      price: 28,
+      price: '28.00',
       stock: 100,
     },
     {
@@ -449,15 +381,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'jardín',
-      germinationRate: 88,
+      germinationRate: '88.00',
       daysToGerminate: 7,
       daysToHarvest: 100,
-      weightOptions: [
-        { g: 30, price: 25, stock: 90 },
-        { g: 100, price: 65, stock: 40 },
-      ],
+      weightOptions: [{ g: 30, price: 25, stock: 90 }, { g: 100, price: 65, stock: 40 }],
       images: ['https://images.unsplash.com/photo-1606189934846-a527add8a77b?w=400'],
-      price: 25,
+      price: '25.00',
       stock: 130,
     },
     {
@@ -474,14 +403,12 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 2,
       spaceNeeded: 'maceta_grande',
-      germinationRate: 60,
+      germinationRate: '60.00',
       daysToGerminate: 21,
       daysToHarvest: 120,
-      weightOptions: [
-        { g: 20, price: 35, stock: 45 },
-      ],
+      weightOptions: [{ g: 20, price: 35, stock: 45 }],
       images: ['https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=400'],
-      price: 35,
+      price: '35.00',
       stock: 45,
     },
     // TIERRA
@@ -490,7 +417,7 @@ async function seed() {
       slug: 'tierra-preparada-universal',
       category: 'tierra',
       subcategory: null,
-      description: 'Tierra fertilizedada y lista para usar. Mezcla perfecta de turba, perlita y vermiculita.',
+      description: 'Tierra fertilizada y lista para usar. Mezcla perfecta de turba, perlita y vermiculita.',
       isOrganic: false,
       climateZones: [],
       sowMonths: [],
@@ -502,12 +429,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 5000, price: 120, stock: 40 },
-        { g: 20000, price: 380, stock: 15 },
-      ],
+      weightOptions: [{ g: 5000, price: 120, stock: 40 }, { g: 20000, price: 380, stock: 15 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 120,
+      price: '120.00',
       stock: 55,
     },
     {
@@ -527,12 +451,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 5000, price: 135, stock: 35 },
-        { g: 20000, price: 420, stock: 12 },
-      ],
+      weightOptions: [{ g: 5000, price: 135, stock: 35 }, { g: 20000, price: 420, stock: 12 }],
       images: ['https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400'],
-      price: 135,
+      price: '135.00',
       stock: 47,
     },
     {
@@ -552,12 +473,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 10000, price: 180, stock: 25 },
-        { g: 20000, price: 320, stock: 10 },
-      ],
+      weightOptions: [{ g: 10000, price: 180, stock: 25 }, { g: 20000, price: 320, stock: 10 }],
       images: ['https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400'],
-      price: 180,
+      price: '180.00',
       stock: 35,
     },
     {
@@ -577,12 +495,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 2000, price: 85, stock: 30 },
-        { g: 5000, price: 180, stock: 15 },
-      ],
+      weightOptions: [{ g: 2000, price: 85, stock: 30 }, { g: 5000, price: 180, stock: 15 }],
       images: ['https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400'],
-      price: 85,
+      price: '85.00',
       stock: 45,
     },
     // COMPOSTA
@@ -603,12 +518,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 5000, price: 95, stock: 50 },
-        { g: 20000, price: 280, stock: 20 },
-      ],
+      weightOptions: [{ g: 5000, price: 95, stock: 50 }, { g: 20000, price: 280, stock: 20 }],
       images: ['https://images.unsplash.com/photo-1591886960571-74d43a9e5258?w=400'],
-      price: 95,
+      price: '95.00',
       stock: 70,
     },
     {
@@ -628,12 +540,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 2000, price: 75, stock: 40 },
-        { g: 10000, price: 280, stock: 15 },
-      ],
+      weightOptions: [{ g: 2000, price: 75, stock: 40 }, { g: 10000, price: 280, stock: 15 }],
       images: ['https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400'],
-      price: 75,
+      price: '75.00',
       stock: 55,
     },
     {
@@ -653,12 +562,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 10000, price: 150, stock: 30 },
-        { g: 25000, price: 320, stock: 12 },
-      ],
+      weightOptions: [{ g: 10000, price: 150, stock: 30 }, { g: 25000, price: 320, stock: 12 }],
       images: ['https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=400'],
-      price: 150,
+      price: '150.00',
       stock: 42,
     },
     {
@@ -678,12 +584,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 15000, price: 160, stock: 25 },
-        { g: 30000, price: 280, stock: 8 },
-      ],
+      weightOptions: [{ g: 15000, price: 160, stock: 25 }, { g: 30000, price: 280, stock: 8 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 160,
+      price: '160.00',
       stock: 33,
     },
     // ACCESORIOS
@@ -704,11 +607,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 1000, price: 85, stock: 30 },
-      ],
+      weightOptions: [{ g: 1000, price: 85, stock: 30 }],
       images: ['https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400'],
-      price: 85,
+      price: '85.00',
       stock: 30,
     },
     {
@@ -728,11 +629,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 200, price: 35, stock: 60 },
-      ],
+      weightOptions: [{ g: 200, price: 35, stock: 60 }],
       images: ['https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400'],
-      price: 35,
+      price: '35.00',
       stock: 60,
     },
     {
@@ -740,7 +639,7 @@ async function seed() {
       slug: 'bolsas-cultivo-10l',
       category: 'accesorio',
       subcategory: null,
-      description: 'Bolsas de tela geotextil para cultivo.Excelente aireación de raíces.',
+      description: 'Bolsas de tela geotextil para cultivo. Excelente aireación de raíces.',
       isOrganic: false,
       climateZones: [],
       sowMonths: [],
@@ -752,11 +651,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 100, price: 45, stock: 50 },
-      ],
+      weightOptions: [{ g: 100, price: 45, stock: 50 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 45,
+      price: '45.00',
       stock: 50,
     },
     {
@@ -776,11 +673,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 300, price: 95, stock: 25 },
-      ],
+      weightOptions: [{ g: 300, price: 95, stock: 25 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 95,
+      price: '95.00',
       stock: 25,
     },
     {
@@ -800,11 +695,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 200, price: 120, stock: 20 },
-      ],
+      weightOptions: [{ g: 200, price: 120, stock: 20 }],
       images: ['https://images.unsplash.com/photo-1617576683096-00fc8eecb3af?w=400'],
-      price: 120,
+      price: '120.00',
       stock: 20,
     },
     {
@@ -824,11 +717,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 100, price: 65, stock: 35 },
-      ],
+      weightOptions: [{ g: 100, price: 65, stock: 35 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 65,
+      price: '65.00',
       stock: 35,
     },
     {
@@ -848,11 +739,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 200, price: 55, stock: 25 },
-      ],
+      weightOptions: [{ g: 200, price: 55, stock: 25 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 55,
+      price: '55.00',
       stock: 25,
     },
     {
@@ -860,7 +749,7 @@ async function seed() {
       slug: 'manguera-10m',
       category: 'accesorio',
       subcategory: null,
-      description: 'Manguera flexible con pistola de riego adjustable.',
+      description: 'Manguera flexible con pistola de riego ajustable.',
       isOrganic: false,
       climateZones: [],
       sowMonths: [],
@@ -872,11 +761,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 1500, price: 280, stock: 10 },
-      ],
+      weightOptions: [{ g: 1500, price: 280, stock: 10 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 280,
+      price: '280.00',
       stock: 10,
     },
     {
@@ -896,11 +783,9 @@ async function seed() {
       germinationRate: null,
       daysToGerminate: null,
       daysToHarvest: null,
-      weightOptions: [
-        { g: 100, price: 110, stock: 15 },
-      ],
+      weightOptions: [{ g: 100, price: 110, stock: 15 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 110,
+      price: '110.00',
       stock: 15,
     },
     {
@@ -917,18 +802,17 @@ async function seed() {
       sunNeeds: 3,
       careLevel: 1,
       spaceNeeded: 'maceta_grande',
-      germinationRate: 88,
+      germinationRate: '88.00',
       daysToGerminate: 10,
       daysToHarvest: 65,
-      weightOptions: [
-        { g: 200, price: 150, stock: 40 },
-      ],
+      weightOptions: [{ g: 200, price: 150, stock: 40 }],
       images: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400'],
-      price: 150,
+      price: '150.00',
       stock: 40,
     },
   ];
 
+  // Insert all products
   for (const product of seedProducts) {
     await db.insert(products).values({
       ...product,
@@ -937,8 +821,5 @@ async function seed() {
     });
   }
 
-  console.log(`✅ Created ${seedProducts.length} products`);
-  console.log('🎉 Seed completed!');
+  console.log(`✅ ${seedProducts.length} products seeded`);
 }
-
-seed().catch(console.error);

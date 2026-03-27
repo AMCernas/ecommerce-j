@@ -19,11 +19,14 @@
   },
   "dependencies": {
     "@ecoomerce-jardineria/db": "workspace:*",
+    "@ecoomerce-jardineria/stripe": "workspace:*",
     "@ecoomerce-jardineria/types": "workspace:*",
     "@hono/node-server": "^1.13.8",
     "@supabase/supabase-js": "^2.48.1",
     "@trpc/server": "^11.14.1",
+    "drizzle-orm": "^0.38.4",
     "hono": "^4.7.11",
+    "postgres": "^3.4.5",
     "zod": "^3.24.1"
   }
 }

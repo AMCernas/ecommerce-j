@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { Navbar } from '@/components/navbar';
-import { MiniCartDrawer } from '@/components/mini-cart-drawer';
+import { CartDrawer } from '@/components/cart/CartDrawer';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +44,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <Navbar />
-          <MiniCartDrawer />
+          <CartDrawer />
           {children}
           <Footer />
         </Providers>

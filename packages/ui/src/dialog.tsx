@@ -102,6 +102,31 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
+// Slide-in drawer variant for cart
+const DialogDrawer = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay className="bg-black/50 backdrop-blur-sm" />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        'fixed right-0 top-0 z-50 h-full w-full max-w-md bg-white shadow-xl',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=closed]:duration-300 data-[state=open]:duration-300',
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+        'data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right-full',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </DialogPrimitive.Content>
+  </DialogPortal>
+));
+DialogDrawer.displayName = 'DialogDrawer';
+
 export {
   Dialog,
   DialogPortal,
@@ -113,4 +138,5 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  DialogDrawer,
 };

@@ -7,80 +7,139 @@ import { z } from 'zod';
 import { Button, Input, Label } from '@ecoomerce-jardineria/ui';
 import { useCartStore } from '@/store/cart';
 import { useCheckoutStore, ShippingAddress } from '@/store/checkout';
+import { createAddress, updateAddress } from '@/lib/account/actions';
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { addressSchema } from '@/lib/account/types';
 
-const shippingSchema = z.object({
-  email: z.string().email('Ingresa un correo electrónico válido'),
-  name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  street: z.string().min(1, 'La calle es requerida'),
-  exteriorNumber: z.string().min(1, 'El número exterior es requerido'),
-  interiorNumber: z.string().optional(),
-  neighborhood: z.string().min(1, 'La colonia es requerida'),
-  city: z.string().min(1, 'La ciudad es requerida'),
-  state: z.string().min(1, 'El estado es requerido'),
-  postalCode: z
-    .string()
-    .length(5, 'El código postal debe tener 5 dígitos')
-    .regex(/^\d{5}$/, 'Solo números'),
-  phone: z
-    .string()
-    .length(10, 'El teléfono debe tener 10 dígitos')
-    .regex(/^\d{10}$/, 'Solo números'),
+const shippingSchema = addressSchema.extend({
+  email: z.string().email('Ingresa un correo electrónico válido').optional(),
 });
 
 type ShippingFormData = z.infer<typeof shippingSchema>;
 
 interface ShippingFormProps {
+  mode?: 'checkout' | 'standalone';
+  userId?: string;
+  addressId?: string;
+  defaultValues?: Partial<ShippingFormData>;
   onBack?: () => void;
+  onSuccess?: () => void;
 }
 
-export function ShippingForm({ onBack }: ShippingFormProps) {
+export function ShippingForm({ 
+  mode = 'checkout', 
+  userId,
+  addressId,
+  defaultValues,
+  onBack, 
+  onSuccess 
+}: ShippingFormProps) {
   const router = useRouter();
-  const { items, getSubtotal, getShippingCost } = useCartStore();
+  const { items } = useCartStore();
   const { setShippingData, setStep, shippingData } = useCheckoutStore();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setFocus,
   } = useForm<ShippingFormData>({
     resolver: zodResolver(shippingSchema),
-    defaultValues: shippingData || undefined,
+    defaultValues: defaultValues || shippingData || undefined,
   });
 
   const onSubmit = async (data: ShippingFormData) => {
-    setShippingData(data as ShippingAddress);
-    setStep('pago');
-    router.push('/checkout/pago');
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    if (mode === 'standalone' && userId) {
+      // Standalone mode: create or update address
+      const addressData = {
+        name: data.name,
+        street: data.street,
+        exteriorNumber: data.exteriorNumber,
+        interiorNumber: data.interiorNumber,
+        neighborhood: data.neighborhood,
+        city: data.city,
+        state: data.state,
+        postalCode: data.postalCode,
+        phone: data.phone,
+        isDefault: true,
+      };
+
+      let result;
+      if (addressId) {
+        result = await updateAddress(addressId, userId, addressData);
+      } else {
+        result = await createAddress(userId, addressData);
+      }
+
+      if ('error' in result) {
+        setSubmitError(result.error);
+      } else {
+        setSubmitSuccess(true);
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push('/cuenta/direcciones');
+          router.refresh();
+        }
+      }
+    } else {
+      // Checkout mode: proceed to payment
+      setShippingData(data as ShippingAddress);
+      setStep('pago');
+      router.push('/checkout/pago');
+    }
   };
 
-  // Redirect if cart is empty
-  if (items.length === 0) {
+  // Redirect if cart is empty in checkout mode
+  if (mode === 'checkout' && items.length === 0) {
     router.push('/carrito');
     return null;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Success Message */}
+      {submitSuccess && (
+        <div className="flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-lg">
+          <CheckCircle className="h-5 w-5" />
+          <span>Dirección guardada correctamente</span>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {submitError && (
+        <div className="flex items-center gap-2 p-4 bg-red-50 text-red-700 rounded-lg">
+          <AlertCircle className="h-5 w-5" />
+          <span>{submitError}</span>
+        </div>
+      )}
+
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          Información de Envío
+          {mode === 'standalone' ? 'Dirección de Envío' : 'Información de Envío'}
         </h2>
 
-        {/* Email */}
-        <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico *</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="tu@email.com"
-            {...register('email')}
-            aria-invalid={!!errors.email}
-          />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email.message}</p>
-          )}
-        </div>
+        {/* Email - only in checkout mode */}
+        {mode === 'checkout' && (
+          <div className="space-y-2">
+            <Label htmlFor="email">Correo electrónico *</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="tu@email.com"
+              {...register('email')}
+              aria-invalid={!!errors.email}
+            />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
+          </div>
+        )}
 
         {/* Nombre Completo */}
         <div className="space-y-2">
@@ -225,7 +284,16 @@ export function ShippingForm({ onBack }: ShippingFormProps) {
           className="flex-1"
           disabled={isSubmitting}
         >
-          Continuar al Pago
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Guardando...
+            </>
+          ) : mode === 'standalone' ? (
+            'Guardar Dirección'
+          ) : (
+            'Continuar al Pago'
+          )}
         </Button>
       </div>
     </form>

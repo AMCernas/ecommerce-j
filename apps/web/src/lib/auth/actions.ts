@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { sendEmail, renderEmail, WelcomeEmail } from '@ecoomerce-jardineria/emails';
 
 export type AuthResult = 
   | { success: true; user: { id: string; email: string } }
@@ -77,6 +78,9 @@ export async function signUpWithEmail(
   }
 
   if (data.user) {
+    // Send welcome email (non-blocking, errors logged but not thrown)
+    sendWelcomeEmail(data.user.email!, fullName);
+
     // Si el email está confirmado (en dev), redirigimos
     if (data.session) {
       revalidatePath('/', 'layout');
@@ -173,5 +177,32 @@ export async function signInWithGoogle(): Promise<void> {
 
   if (data.url) {
     redirect(data.url);
+  }
+}
+
+/**
+ * Send welcome email to new user
+ * Non-blocking: errors are logged but not thrown to prevent blocking registration
+ */
+async function sendWelcomeEmail(email: string, fullName: string): Promise<void> {
+  try {
+    const html = await renderEmail(WelcomeEmail({
+      customerName: fullName,
+      email,
+    }));
+
+    const result = await sendEmail({
+      to: email,
+      subject: '¡Bienvenido a Jardín Verde! 🌱',
+      html,
+    });
+
+    if (!result.success) {
+      console.warn(`Failed to send welcome email to ${email}: ${result.error}`);
+    } else {
+      console.log(`Welcome email sent to ${email}, messageId: ${result.messageId}`);
+    }
+  } catch (err) {
+    console.error(`Error sending welcome email to ${email}:`, err);
   }
 }

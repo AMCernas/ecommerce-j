@@ -36,6 +36,8 @@ export function SPEIPayment({ onSuccess, onBack }: SPEIPaymentProps) {
         }
 
         const orderResult = await createOrder({
+          customerEmail: shippingData.email,
+          customerName: shippingData.name,
           items: [],
           subtotal: getSubtotal(),
           shippingCost: getShippingCost(),

@@ -75,6 +75,8 @@ function CardPaymentFormInner({ onSuccess, onBack }: CardPaymentFormProps) {
       }
 
       const orderResult = await createOrder({
+        customerEmail: shippingData.email,
+        customerName: shippingData.name,
         items: items.map((item) => ({
           productId: item.productId,
           productName: item.name,

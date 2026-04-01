@@ -27,6 +27,8 @@ export interface OrderItemInput {
 
 export interface CreateOrderInput {
   userId?: string;
+  customerEmail: string;
+  customerName: string;
   items: OrderItemInput[];
   subtotal: number;
   shippingCost: number;
@@ -38,12 +40,14 @@ export interface CreateOrderInput {
 }
 
 export async function createOrder(input: CreateOrderInput) {
-  const { userId, items, subtotal, shippingCost, discount, total, paymentMethod, shippingAddress } = input;
+  const { userId, customerEmail, customerName, items, subtotal, shippingCost, discount, total, paymentMethod, shippingAddress } = input;
   
   try {
     // Create order - only required fields
     const orderData = {
       userId: userId || null,
+      customerEmail,
+      customerName,
       status: 'pending' as const,
       subtotal: String(subtotal),
       shippingCost: String(shippingCost),

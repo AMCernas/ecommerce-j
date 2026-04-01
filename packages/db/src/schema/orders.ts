@@ -36,6 +36,8 @@ export const orders = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: uuid('user_id'),
+    customerEmail: text('customer_email').notNull(), // Required for email notifications
+    customerName: text('customer_name').notNull(), // Required for email personalization
     status: text('status').default('pending'), // pending | paid | shipped | delivered | refunded
     subtotal: decimal('subtotal', { precision: 10, scale: 2 }).notNull(),
     shippingCost: decimal('shipping_cost').default('0'),
@@ -64,6 +66,7 @@ export const orders = pgTable(
     index('idx_orders_user').on(table.userId),
     index('idx_orders_status').on(table.status),
     index('idx_orders_created').on(table.createdAt),
+    index('idx_orders_customer_email').on(table.customerEmail),
   ]
 );
 

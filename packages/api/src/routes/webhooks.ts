@@ -11,6 +11,7 @@ import Stripe from 'stripe';
 import { verifyWebhookSignature, parseWebhookEvent, mapEventToOrderStatus } from '@ecoomerce-jardineria/stripe';
 import { db } from '@ecoomerce-jardineria/db';
 import { orders, paymentEvents } from '@ecoomerce-jardineria/db';
+import { sendEmail, renderEmail, OrderStatusUpdateEmail } from '@ecoomerce-jardineria/emails';
 import type { Env } from '../app';
 
 export const webhooksRouter = new Hono<{ Bindings: Env }>();
@@ -152,9 +153,42 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
     });
 
     console.log(`Order ${order.id} updated to status: ${newStatus}`);
+
+    // Send status update email (non-blocking, errors logged but not thrown)
+    sendStatusUpdateEmail(order, newStatus);
   } catch (error) {
     console.error('Failed to update order:', error);
     throw error;
+  }
+}
+
+/**
+ * Send order status update email
+ * Non-blocking: errors are logged but not thrown to prevent webhook failures
+ */
+async function sendStatusUpdateEmail(order: typeof orders.$inferSelect, newStatus: string): Promise<void> {
+  try {
+    const html = await renderEmail(OrderStatusUpdateEmail({
+      orderId: order.id,
+      customerName: order.customerName,
+      previousStatus: order.status || 'unknown',
+      newStatus,
+      trackingNumber: order.trackingNumber || undefined,
+    }));
+
+    const result = await sendEmail({
+      to: order.customerEmail,
+      subject: `Actualización de tu pedido #${order.id}`,
+      html,
+    });
+
+    if (!result.success) {
+      console.warn(`Failed to send status email for order ${order.id}: ${result.error}`);
+    } else {
+      console.log(`Status email sent for order ${order.id}, messageId: ${result.messageId}`);
+    }
+  } catch (err) {
+    console.error(`Error sending status email for order ${order.id}:`, err);
   }
 }
 

@@ -42,6 +42,8 @@ export function OXXOPayment({ onSuccess, onBack }: OXXOPaymentProps) {
         }
 
         const orderResult = await createOrder({
+          customerEmail: shippingData.email,
+          customerName: customerName,
           items: [], // Will be filled from cart
           subtotal: getSubtotal(),
           shippingCost: getShippingCost(),

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@ecoomerce-jardineria/db": "workspace:*",
+    "@ecoomerce-jardineria/emails": "workspace:*",
     "@ecoomerce-jardineria/stripe": "workspace:*",
     "@ecoomerce-jardineria/types": "workspace:*",
     "@hono/node-server": "^1.13.8",

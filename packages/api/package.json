@@ -10,12 +10,15 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.0.0"
   },
   "dependencies": {
     "@ecoomerce-jardineria/db": "workspace:*",
@@ -27,6 +30,7 @@
     "@trpc/server": "^11.14.1",
     "drizzle-orm": "^0.38.4",
     "hono": "^4.7.11",
+    "jose": "^6.2.2",
     "postgres": "^3.4.5",
     "zod": "^3.24.1"
   }

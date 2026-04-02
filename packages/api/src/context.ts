@@ -3,7 +3,7 @@ import { H } from '@hono/node-server';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { db } from '@ecoomerce-jardineria/db';
-import { users } from '@ecoomerce-jardineria/db/src/schema';
+import { users } from '@ecoomerce-jardineria/db';
 import { eq } from 'drizzle-orm';
 
 export interface Context {

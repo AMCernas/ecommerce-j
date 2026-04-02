@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
     if (user) {
       // Check if admin
       const { data: userData } = await supabase
-        .from('usuarios')
+        .from('users')
         .select('role')
         .eq('id', user.id)
         .single();
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
 
     // Verify admin role
     const { data: userData } = await supabase
-      .from('usuarios')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single();

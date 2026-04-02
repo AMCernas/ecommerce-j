@@ -3,6 +3,7 @@ export * from './src/products';
 export * from './src/orders';
 export * from './src/users';
 export * from './src/checkout';
+export * from './src/auth';
 
 // Type aliases from AGENT.md conventions
 export type TProduct = typeof import('./src/products').Product;

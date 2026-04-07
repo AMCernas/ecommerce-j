@@ -1,9 +1,9 @@
 // Shared types for the e-commerce platform
-export * from './src/products';
-export * from './src/orders';
-export * from './src/users';
-export * from './src/checkout';
-export * from './src/auth';
+export * from './products';
+export * from './orders';
+export * from './users';
+export * from './checkout';
+export * from './auth';
 
 // Type aliases from AGENT.md conventions
 export type TProduct = typeof import('./src/products').Product;
@@ -33,7 +33,7 @@ export type ProductSubcategory =
   | 'ornamental';
 
 // Order status
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'refunded';
+export type { OrderStatus } from './src/orders';
 
 // User roles
 export type UserRole = 'cliente' | 'admin' | 'mayoreo';

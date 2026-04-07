@@ -12,6 +12,7 @@ import { verifyWebhookSignature, parseWebhookEvent, mapEventToOrderStatus } from
 import { db } from '@ecoomerce-jardineria/db';
 import { orders, paymentEvents } from '@ecoomerce-jardineria/db';
 import { sendEmail, renderEmail, OrderStatusUpdateEmail } from '@ecoomerce-jardineria/emails';
+import { isValidStatusTransition } from '../utils/order-status';
 import type { Env } from '../app';
 
 export const webhooksRouter = new Hono<{ Bindings: Env }>();
@@ -190,23 +191,6 @@ async function sendStatusUpdateEmail(order: typeof orders.$inferSelect, newStatu
   } catch (err) {
     console.error(`Error sending status email for order ${order.id}:`, err);
   }
-}
-
-/**
- * Validates if a status transition is allowed
- */
-function isValidStatusTransition(currentStatus: string, newStatus: string): boolean {
-  const validTransitions: Record<string, string[]> = {
-    'pending': ['paid', 'failed', 'cancelled'],
-    'paid': ['refunded'],
-    'shipped': ['delivered', 'refunded'],
-    'delivered': ['refunded'],
-    'failed': ['pending', 'cancelled'], // Allow retry or cancel
-    'cancelled': [], // Terminal state
-    'refunded': [], // Terminal state
-  };
-
-  return validTransitions[currentStatus]?.includes(newStatus) ?? false;
 }
 
 /**

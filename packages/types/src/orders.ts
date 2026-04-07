@@ -1,8 +1,11 @@
+// Order status type (used across the app)
+export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'refunded' | 'failed' | 'cancelled';
+
 // Order types
 export interface Order {
   id: string;
   userId: string | null;
-  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'refunded';
+  status: OrderStatus;
   subtotal: number;
   shippingCost: number;
   discount: number;
@@ -14,6 +17,8 @@ export interface Order {
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;
+  customerEmail: string;
+  customerName: string;
   items: OrderItem[];
 }
 
@@ -61,4 +66,28 @@ export interface Cart {
   discount: number;
   shippingCost: number;
   total: number;
+}
+
+// Admin-specific types
+export interface AdminOrderListFilters {
+  status?: OrderStatus;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  search?: string;
+}
+
+export interface OrderUpdateInput {
+  status?: OrderStatus;
+  trackingNumber?: string | null;
+  notes?: string | null;
+}
+
+export interface PaginatedOrdersResult {
+  orders: Order[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }

@@ -30,6 +30,13 @@ export interface ClabeData {
   expiresAt: string;
 }
 
+export interface DiscountInfo {
+  code: string;
+  type: 'percentage' | 'fixed_mxn';
+  value: string;
+  calculatedDiscount: number;
+}
+
 interface CheckoutStore {
   // State
   currentStep: CheckoutStep;
@@ -39,6 +46,8 @@ interface CheckoutStore {
   clientSecret: string | null;
   voucherData: VoucherData | null;
   clabeData: ClabeData | null;
+  discount: DiscountInfo | null;
+  discountError: string | null;
 
   // Actions
   setStep: (step: CheckoutStep) => void;
@@ -48,6 +57,9 @@ interface CheckoutStore {
   setClientSecret: (secret: string) => void;
   setVoucherData: (data: VoucherData | null) => void;
   setClabeData: (data: ClabeData | null) => void;
+  applyDiscount: (discount: DiscountInfo) => void;
+  clearDiscount: () => void;
+  setDiscountError: (error: string | null) => void;
   reset: () => void;
 }
 
@@ -59,6 +71,8 @@ const initialState = {
   clientSecret: null,
   voucherData: null,
   clabeData: null,
+  discount: null,
+  discountError: null,
 };
 
 export const useCheckoutStore = create<CheckoutStore>((set) => ({
@@ -77,6 +91,12 @@ export const useCheckoutStore = create<CheckoutStore>((set) => ({
   setVoucherData: (data) => set({ voucherData: data }),
 
   setClabeData: (data) => set({ clabeData: data }),
+
+  applyDiscount: (discount) => set({ discount, discountError: null }),
+
+  clearDiscount: () => set({ discount: null, discountError: null }),
+
+  setDiscountError: (error) => set({ discountError: error }),
 
   reset: () => set(initialState),
 }));

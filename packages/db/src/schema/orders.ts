@@ -59,6 +59,7 @@ export const orders = pgTable(
     trackingNumber: text('tracking_number'),
     notes: text('notes'),
     discountCodeId: uuid('discount_code_id'),
+    discountCode: text('discount_code'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },

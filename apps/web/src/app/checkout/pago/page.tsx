@@ -8,14 +8,18 @@ import { PaymentMethodSelector } from '@/components/checkout/PaymentMethodSelect
 import { CardPaymentForm } from '@/components/checkout/CardPaymentForm';
 import { OXXOPayment } from '@/components/checkout/OXXOPayment';
 import { SPEIPayment } from '@/components/checkout/SPEIPayment';
+import { DiscountInput } from '@/components/checkout/DiscountInput';
 
 export default function PagoPage() {
   const router = useRouter();
-  const { setStep, currentStep, paymentMethod, setPaymentMethod, shippingData } =
+  const { setStep, currentStep, paymentMethod, setPaymentMethod, shippingData, discount } =
     useCheckoutStore();
   const { items, getSubtotal, getShippingCost, getTotal } = useCartStore();
 
-  const total = getTotal();
+  const subtotal = getSubtotal();
+  const shippingCost = getShippingCost();
+  const discountAmount = discount?.calculatedDiscount ?? 0;
+  const total = getTotal() - discountAmount;
 
   useEffect(() => {
     // Ensure we're on the pago step
@@ -55,13 +59,32 @@ export default function PagoPage() {
     <div className="space-y-6">
       {/* Order Summary */}
       <div className="bg-white rounded-xl shadow-sm p-4">
-        <div className="flex justify-between items-center">
-          <span className="text-gray-600">Total a pagar</span>
-          <span className="text-2xl font-bold text-green-700">
-            ${total.toFixed(2)}
-          </span>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Subtotal</span>
+            <span className="font-medium">${subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Envío</span>
+            <span className="font-medium">${shippingCost.toFixed(2)}</span>
+          </div>
+          {discount && (
+            <div className="flex justify-between items-center text-green-600">
+              <span>Descuento ({discount.code})</span>
+              <span>-${discountAmount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="border-t pt-2 flex justify-between items-center">
+            <span className="text-gray-900 font-semibold">Total a pagar</span>
+            <span className="text-2xl font-bold text-green-700">
+              ${total.toFixed(2)}
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* Discount Code Input */}
+      <DiscountInput subtotal={subtotal} />
 
       {/* Payment Method Selection */}
       {!paymentMethod && (

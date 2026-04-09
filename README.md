@@ -261,5 +261,3 @@ pnpm test -- --coverage
 4. Crear PR con descripción clara
 
 ## 📄 Licencia
-
-Privado — Uso interno.

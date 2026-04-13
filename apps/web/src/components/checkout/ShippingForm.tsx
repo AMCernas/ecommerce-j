@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Button, Input, Label } from '@ecoomerce-jardineria/ui';
 import { useCartStore } from '@/store/cart';
 import { useCheckoutStore, ShippingAddress } from '@/store/checkout';
+import { DiscountInput } from './DiscountInput';
 
 const shippingSchema = z.object({
   email: z.string().email('Ingresa un correo electrónico válido'),

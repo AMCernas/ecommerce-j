@@ -6,6 +6,7 @@ import { Button } from '@ecoomerce-jardineria/ui';
 import { useCheckoutStore } from '@/store/checkout';
 import { useCartStore } from '@/store/cart';
 import { createOrder } from '@/lib/orders/actions';
+import { DiscountInput } from './DiscountInput';
 import { cn } from '@ecoomerce-jardineria/ui';
 
 interface SPEIPaymentProps {
@@ -18,11 +19,14 @@ export function SPEIPayment({ onSuccess, onBack }: SPEIPaymentProps) {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const { shippingData, orderId, setOrderId, clabeData, setClabeData } =
+  const { shippingData, orderId, setOrderId, clabeData, setClabeData, discount } =
     useCheckoutStore();
   const { getSubtotal, getShippingCost } = useCartStore();
 
-  const total = getSubtotal() + getShippingCost();
+  const subtotal = getSubtotal();
+  const shippingCost = getShippingCost();
+  const discountAmount = discount?.calculatedDiscount ?? 0;
+  const total = subtotal + shippingCost - discountAmount;
 
   const handleGetCLABE = async () => {
     setIsLoading(true);
@@ -39,11 +43,12 @@ export function SPEIPayment({ onSuccess, onBack }: SPEIPaymentProps) {
           customerEmail: shippingData.email,
           customerName: shippingData.name,
           items: [],
-          subtotal: getSubtotal(),
-          shippingCost: getShippingCost(),
-          discount: 0,
+          subtotal: subtotal,
+          shippingCost: shippingCost,
+          discount: discountAmount,
           total,
           paymentMethod: 'spei',
+          discountCode: discount?.code,
           shippingAddress: {
             name: shippingData.name,
             street: shippingData.street,

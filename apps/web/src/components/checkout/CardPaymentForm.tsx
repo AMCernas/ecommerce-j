@@ -46,10 +46,13 @@ function CardPaymentFormInner({ onSuccess, onBack }: CardPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { shippingData, setOrderId } = useCheckoutStore();
+  const { shippingData, setOrderId, discount } = useCheckoutStore();
   const { items, getSubtotal, getShippingCost, clearCart } = useCartStore();
 
-  const total = getSubtotal() + getShippingCost();
+  const subtotal = getSubtotal();
+  const shippingCost = getShippingCost();
+  const discountAmount = discount?.calculatedDiscount ?? 0;
+  const total = subtotal + shippingCost - discountAmount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,11 +87,12 @@ function CardPaymentFormInner({ onSuccess, onBack }: CardPaymentFormProps) {
           quantity: item.quantity,
           unitPrice: item.price,
         })),
-        subtotal: getSubtotal(),
-        shippingCost: getShippingCost(),
-        discount: 0,
+        subtotal: subtotal,
+        shippingCost: shippingCost,
+        discount: discountAmount,
         total,
         paymentMethod: 'card',
+        discountCode: discount?.code,
         shippingAddress: {
           name: shippingData.name,
           street: shippingData.street,

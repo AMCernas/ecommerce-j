@@ -6,6 +6,7 @@ import { Button, Input, Label } from '@ecoomerce-jardineria/ui';
 import { useCheckoutStore } from '@/store/checkout';
 import { useCartStore } from '@/store/cart';
 import { createOrder } from '@/lib/orders/actions';
+import { DiscountInput } from './DiscountInput';
 
 interface OXXOPaymentProps {
   onSuccess: (orderId: string) => void;
@@ -17,11 +18,14 @@ export function OXXOPayment({ onSuccess, onBack }: OXXOPaymentProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { shippingData, orderId, setOrderId, voucherData, setVoucherData } =
+  const { shippingData, orderId, setOrderId, voucherData, setVoucherData, discount } =
     useCheckoutStore();
   const { getSubtotal, getShippingCost } = useCartStore();
 
-  const total = getSubtotal() + getShippingCost();
+  const subtotal = getSubtotal();
+  const shippingCost = getShippingCost();
+  const discountAmount = discount?.calculatedDiscount ?? 0;
+  const total = subtotal + shippingCost - discountAmount;
 
   const handleGenerateVoucher = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +49,12 @@ export function OXXOPayment({ onSuccess, onBack }: OXXOPaymentProps) {
           customerEmail: shippingData.email,
           customerName: customerName,
           items: [], // Will be filled from cart
-          subtotal: getSubtotal(),
-          shippingCost: getShippingCost(),
-          discount: 0,
+          subtotal: subtotal,
+          shippingCost: shippingCost,
+          discount: discountAmount,
           total,
           paymentMethod: 'oxxo',
+          discountCode: discount?.code,
           shippingAddress: {
             name: shippingData.name,
             street: shippingData.street,
